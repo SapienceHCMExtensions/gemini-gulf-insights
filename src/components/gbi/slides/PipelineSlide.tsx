@@ -84,10 +84,23 @@ export const PipelineSlide = ({ view, setView }: any) => {
     <GraphView
       title="B2B Funnel Analysis"
       data={[
-        { label: 'Prospecting', value: 'BHD 287K', percent: 95 },
-        { label: 'Negotiation', value: 'BHD 185K', percent: 70 },
-        { label: 'Contract Sent', value: 'BHD 95K', percent: 40 },
-        { label: 'Active Account', value: 'BHD 42K (New)', percent: 25 }
+        { label: 'Prospecting', value: 'BHD 287K', percent: 95, breakdown: [
+          { name: 'New Beach Club (Zallaq)', value: 95000, secondary: '20%' },
+          { name: 'Boutique Hotel Manama', value: 120000, secondary: '15%' },
+          { name: 'Corporate Gift Baskets', value: 72000, secondary: '25%' }
+        ]},
+        { label: 'Negotiation', value: 'BHD 185K', percent: 70, breakdown: [
+          { name: 'Hilton Juffair Minibars', value: 105000, secondary: '60%' },
+          { name: 'F1 Village Paddock Club', value: 80000, secondary: '70%' }
+        ]},
+        { label: 'Contract Sent', value: 'BHD 95K', percent: 40, breakdown: [
+          { name: 'Grand Yard House Renewal', value: 95000, secondary: '85%', note: 'Awaiting credit approval' }
+        ]},
+        { label: 'Active Account', value: 'BHD 42K (New)', percent: 25, breakdown: [
+          { name: 'Wyndham Grand Lounge', value: 18000 },
+          { name: 'Sofitel Beach Bar', value: 14500 },
+          { name: 'Downtown Rotana', value: 9500 }
+        ]}
       ]}
     />
   );

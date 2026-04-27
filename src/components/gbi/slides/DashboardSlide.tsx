@@ -62,10 +62,26 @@ export const DashboardSlide = ({ view, setView }: any) => {
     <GraphView
       title="GBI Wholesale Revenue Trend"
       data={[
-        { label: 'Jan', value: '710K', percent: 65 },
-        { label: 'Feb', value: '735K', percent: 75 },
-        { label: 'Mar', value: '845K', percent: 85 },
-        { label: 'Apr (Est)', value: '920K', percent: 95 }
+        { label: 'Jan', value: 'BHD 710K', percent: 65, breakdown: [
+          { name: 'On-Trade (Hotels & Bars)', value: 462000, secondary: '65%' },
+          { name: 'Retail Store', value: 177500, secondary: '25%' },
+          { name: 'GBI Express', value: 70500, secondary: '10%' }
+        ]},
+        { label: 'Feb', value: 'BHD 735K', percent: 75, breakdown: [
+          { name: 'On-Trade (Hotels & Bars)', value: 477750, secondary: '65%' },
+          { name: 'Retail Store', value: 183750, secondary: '25%' },
+          { name: 'GBI Express', value: 73500, secondary: '10%' }
+        ]},
+        { label: 'Mar', value: 'BHD 845K', percent: 85, breakdown: [
+          { name: 'On-Trade (Hotels & Bars)', value: 549250, secondary: '65%' },
+          { name: 'Retail Store', value: 211250, secondary: '25%' },
+          { name: 'GBI Express', value: 84500, secondary: '10%' }
+        ]},
+        { label: 'Apr (Est)', value: 'BHD 920K', percent: 95, breakdown: [
+          { name: 'On-Trade (Hotels & Bars)', value: 598000, secondary: '65%', note: 'Driven by F1 hospitality contracts' },
+          { name: 'Retail Store', value: 230000, secondary: '25%' },
+          { name: 'GBI Express', value: 92000, secondary: '10%', note: 'Online channel +18% MoM' }
+        ]}
       ]}
     />
   );

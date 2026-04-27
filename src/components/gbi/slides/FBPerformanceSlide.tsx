@@ -114,10 +114,26 @@ export const FBPerformanceSlide = ({ view, setView }: any) => {
     <GraphView
       title="Revenue Share by Key Client"
       data={[
-        { label: "McGettigan's", value: 'BHD 23.6K', percent: 95 },
-        { label: "JJ's Pub", value: 'BHD 16.7K', percent: 70 },
-        { label: "Sherlock", value: 'BHD 8.9K', percent: 45 },
-        { label: "CUT Lounge", value: 'BHD 21.4K', percent: 85 }
+        { label: "McGettigan's", value: 'BHD 23.6K', percent: 95, breakdown: [
+          { name: 'Spirits', value: 15200, secondary: 150, note: 'Revenue / Cases' },
+          { name: 'Beer (Kegs/Cases)', value: 5800, secondary: 420 },
+          { name: 'Wine', value: 2600, secondary: 670 }
+        ]},
+        { label: "JJ's Pub", value: 'BHD 16.7K', percent: 70, breakdown: [
+          { name: 'Spirits', value: 11500, secondary: 80 },
+          { name: 'Beer (Kegs/Cases)', value: 3700, secondary: 310 },
+          { name: 'Wine', value: 1500, secondary: 590 }
+        ]},
+        { label: "Sherlock", value: 'BHD 8.9K', percent: 45, breakdown: [
+          { name: 'Spirits', value: 6800, secondary: 110, note: 'Volume -15% vs benchmark' },
+          { name: 'Beer (Kegs/Cases)', value: 1700, secondary: 240 },
+          { name: 'Wine', value: 400, secondary: 100 }
+        ]},
+        { label: "CUT Lounge", value: 'BHD 21.4K', percent: 85, breakdown: [
+          { name: 'Spirits', value: 9400, secondary: 40 },
+          { name: 'Beer (Kegs/Cases)', value: 2400, secondary: 180 },
+          { name: 'Wine', value: 9600, secondary: 90, note: 'Premium wine driver' }
+        ]}
       ]}
     />
   );
