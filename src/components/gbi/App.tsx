@@ -6,6 +6,9 @@ import { FBPerformanceSlide } from './slides/FBPerformanceSlide';
 import { PipelineSlide } from './slides/PipelineSlide';
 import { MarketingSlide } from './slides/MarketingSlide';
 import { ClosingSlide } from './slides/ClosingSlide';
+import { Customer360Slide } from './slides/Customer360Slide';
+import { StakeholderValueMapSlide } from './slides/StakeholderValueMapSlide';
+import { RoadmapSlide } from './slides/RoadmapSlide';
 
 export const App = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -13,10 +16,13 @@ export const App = () => {
 
   const slides: any[] = [
     { type: 'title', content: <TitleSlide /> },
+    { type: 'stakeholder', content: <StakeholderValueMapSlide /> },
     { id: 'overview', component: <DashboardSlide view={view} setView={setView} /> },
     { id: 'fb', component: <FBPerformanceSlide view={view} setView={setView} /> },
     { id: 'crm', component: <PipelineSlide view={view} setView={setView} /> },
     { id: 'marketing', component: <MarketingSlide view={view} setView={setView} /> },
+    { id: 'customer360', component: <Customer360Slide view={view} setView={setView} /> },
+    { type: 'roadmap', content: <RoadmapSlide /> },
     { type: 'closing', content: <ClosingSlide /> }
   ];
 
@@ -35,9 +41,7 @@ export const App = () => {
       <div className="w-full h-full max-w-[1280px] max-h-[800px] bg-white shadow-2xl relative flex flex-col overflow-hidden">
 
         <div className="flex-1 overflow-hidden">
-          {slides[currentSlide].type === 'title' || slides[currentSlide].type === 'closing'
-            ? slides[currentSlide].content
-            : slides[currentSlide].component}
+          {slides[currentSlide].content ?? slides[currentSlide].component}
         </div>
 
         {/* Controls Overlay */}
