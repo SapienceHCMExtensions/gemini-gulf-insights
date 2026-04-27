@@ -1,10 +1,12 @@
-# Remove CFO & Head of Retail Ops Cards
+# Make Line & Pie Chart Buttons Functional in GraphView
 
-## Changes to `src/components/gbi/slides/StakeholderValueMapSlide.tsx`
+The Graph view (used in Customer 360 and other slides) currently shows three icons (Bar, Line, Pie) but only the Bar chart renders—the Line and Pie buttons are decorative.
 
-1. Remove the **CFO** persona object from the `personas` array.
-2. Remove the **Head of Retail Ops** persona object from the `personas` array.
-3. Clean up unused icon imports (`Calculator`, `Store`) from the `lucide-react` import.
-4. Update the heading from "One Platform. Six Stakeholders. Measurable Wins." to "One Platform. Four Stakeholders. Measurable Wins." to reflect the remaining 4 cards (CEO, Head of Sales, Head of Marketing, IT Director).
+## Changes to `src/components/gbi/views/GraphView.tsx`
 
-The 3-column grid layout will naturally reflow to show the 4 remaining cards.
+1. Add local `useState<'bar' | 'line' | 'pie'>` state to track the active chart type.
+2. Wire each icon button to switch the active chart and apply active/inactive styling.
+3. Extract the existing bar chart into a `BarChart` subcomponent (unchanged visuals).
+4. Add an SVG-based `LineChart` subcomponent: gridlines, axis labels, a smooth purple line + light fill area, and hoverable data points with tooltips.
+5. Add an SVG-based `PieChart` subcomponent: colored slices using the GBI palette (`#875A7B`, `#017E84`, plus complementary tones), white separators, hover tooltips, and a legend listing each segment with its percentage.
+6. All three charts read the same `data` prop (`{ label, value, percent }[]`) so no callers need to change.
