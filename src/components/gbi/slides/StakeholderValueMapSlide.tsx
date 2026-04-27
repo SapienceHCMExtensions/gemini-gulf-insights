@@ -61,14 +61,14 @@ const personas = [
 export const StakeholderValueMapSlide = () => (
   <div className="h-full bg-white flex flex-col">
     <Header title="Stakeholder Value Map" activeView="dashboard" setView={() => {}} />
-    <div className="flex-1 flex flex-col px-8 md:px-12 py-6 overflow-y-auto">
+    <div className="flex-1 flex flex-col px-8 md:px-12 py-6 pb-24 overflow-y-auto">
       <div className="text-center mb-6 shrink-0">
         <div className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#875A7B] bg-purple-50 px-3 py-1 rounded-full mb-3">For Every Seat at the Table</div>
         <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">One Platform. Six Stakeholders. Measurable Wins.</h2>
         <p className="text-sm text-gray-500 max-w-2xl mx-auto">Odoo speaks the language of every leader at GBI — quantified outcomes, not feature lists.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {personas.map((p, i) => (
           <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col hover:shadow-lg hover:border-[#875A7B]/40 transition-all">
             <div className="flex items-center gap-3 mb-3 pb-3 border-b">
@@ -93,7 +93,7 @@ export const StakeholderValueMapSlide = () => (
         ))}
       </div>
 
-      <div className="mt-6 bg-gradient-to-r from-[#875A7B] to-[#017E84] text-white p-4 rounded-xl flex items-center gap-4 shrink-0">
+      <div className="mt-6 bg-gradient-to-r from-[#875A7B] to-[#017E84] text-white p-4 rounded-xl flex items-center gap-4">
         <div className="bg-white/20 p-2 rounded-lg shrink-0"><Link2 size={20} /></div>
         <p className="text-xs md:text-sm font-medium leading-relaxed">
           <strong className="font-bold">Built on top of your existing investment.</strong> Odoo augments <strong>MS Navision</strong> and <strong>LS Retail</strong> via APIs — zero rip-and-replace, zero disruption to operations or finance.
