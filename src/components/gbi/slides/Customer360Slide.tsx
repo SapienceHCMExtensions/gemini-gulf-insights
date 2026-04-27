@@ -143,11 +143,31 @@ export const Customer360Slide = ({ view, setView }: any) => {
     <GraphView
       title="Engagement Score by Customer Segment"
       data={[
-        { label: 'Premium HORECA (5-Star Hotels)', value: '92 / 100', percent: 92 },
-        { label: 'F1 / Event Partners', value: '85 / 100', percent: 85 },
-        { label: 'Mid-Market Restaurants', value: '68 / 100', percent: 68 },
-        { label: 'Retail Loyalty Members', value: '74 / 100', percent: 74 },
-        { label: 'GBI Express Repeat Buyers', value: '81 / 100', percent: 81 }
+        { label: 'Premium HORECA (5-Star Hotels)', value: '92 / 100', percent: 92, breakdown: [
+          { name: 'The Ritz-Carlton, Bahrain', value: 96, secondary: 184500, note: 'Top contributor' },
+          { name: 'Four Seasons Bahrain', value: 93, secondary: 142500 },
+          { name: 'Gulf Hotel Group', value: 90, secondary: 118600 },
+          { name: 'Wyndham Grand Manama', value: 89, secondary: 82700 }
+        ]},
+        { label: 'F1 / Event Partners', value: '85 / 100', percent: 85, breakdown: [
+          { name: 'Bahrain International Circuit', value: 92, secondary: 96000 },
+          { name: 'F1 Paddock Club Catering', value: 88, secondary: 64000 },
+          { name: 'Corporate Hospitality Agencies', value: 78, secondary: 38500 }
+        ]},
+        { label: 'Mid-Market Restaurants', value: '68 / 100', percent: 68, breakdown: [
+          { name: 'McGettigan\'s', value: 74, secondary: 23600 },
+          { name: 'JJ\'s Irish Pub', value: 71, secondary: 16700 },
+          { name: 'Sherlock Holmes', value: 58, secondary: 8900, note: 'Order volume -15% vs benchmark' }
+        ]},
+        { label: 'Retail Loyalty Members', value: '74 / 100', percent: 74, breakdown: [
+          { name: 'Premium Walk-Ins (Seef)', value: 79, secondary: 142000 },
+          { name: 'Loyalty Card Holders', value: 72, secondary: 86400 }
+        ]},
+        { label: 'GBI Express Repeat Buyers', value: '81 / 100', percent: 81, breakdown: [
+          { name: 'Monthly Subscribers', value: 88, secondary: 48200 },
+          { name: 'Quarterly Buyers', value: 78, secondary: 32400 },
+          { name: 'Occasional Buyers', value: 70, secondary: 18900 }
+        ]}
       ]}
     />
   );

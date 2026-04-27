@@ -100,10 +100,24 @@ export const MarketingSlide = ({ view, setView }: any) => {
     <GraphView
       title="Lead Acquisition Cost & Reach"
       data={[
-        { label: 'Email', value: 'BHD 1.50/Lead', percent: 45 },
-        { label: 'Tastings', value: 'BHD 4.20/Lead', percent: 95 },
-        { label: 'Social', value: 'BHD 0.85/Lead', percent: 65 },
-        { label: 'Organic Search', value: 'BHD 0.00/Lead', percent: 35 }
+        { label: 'Email', value: 'BHD 1.50/Lead', percent: 45, breakdown: [
+          { name: 'F1 Corporate Package Email', value: 450, secondary: 12, note: 'Leads / Conversions' },
+          { name: 'HORECA Quarterly Newsletter', value: 380, secondary: 18 },
+          { name: 'Loyalty Re-Engagement', value: 220, secondary: 9 }
+        ]},
+        { label: 'Tastings', value: 'BHD 4.20/Lead', percent: 95, breakdown: [
+          { name: 'Summer Wine Tasting Event', value: 1240, secondary: 142 },
+          { name: 'Spirits Masterclass — Seef', value: 320, secondary: 48 },
+          { name: 'F1 Pre-Race Tasting', value: 180, secondary: 36 }
+        ]},
+        { label: 'Social', value: 'BHD 0.85/Lead', percent: 65, breakdown: [
+          { name: 'GBI Express Instagram Promo', value: 8200, secondary: 240 },
+          { name: 'Facebook Retargeting', value: 4300, secondary: 110 }
+        ]},
+        { label: 'Organic Search', value: 'BHD 0.00/Lead', percent: 35, breakdown: [
+          { name: 'Brand Search (gulfbrands)', value: 2100, secondary: 180 },
+          { name: 'Generic (wine delivery bahrain)', value: 700, secondary: 42 }
+        ]}
       ]}
     />
   );
