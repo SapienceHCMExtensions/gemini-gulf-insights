@@ -90,7 +90,7 @@ export const RoadmapSlide = () => (
       <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-[#875A7B] to-[#017E84] text-white p-4 rounded-xl">
         <div className="flex-1">
           <h4 className="font-bold text-sm mb-0.5">Start with a 2-Week Discovery Workshop</h4>
-          <p className="text-xs opacity-90">Customer 360 mockup and integration blueprint.</p>
+          <p className="text-xs opacity-90">Will include an analysis of your requirements to implement a Customer engagement platform</p>
         </div>
         <button className="bg-white text-[#875A7B] px-6 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors shrink-0">
           Book Discovery Workshop
