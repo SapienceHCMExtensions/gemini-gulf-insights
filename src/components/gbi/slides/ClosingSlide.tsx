@@ -40,7 +40,7 @@ export const ClosingSlide = () => (
            <button className="bg-[#875A7B] text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-[#714B67] transition-all shadow-lg shadow-[#875A7B]/20">
               Request API Integration Demo
            </button>
-           <p className="mt-4 text-gray-400 text-xs font-bold uppercase tracking-widest">Standard Pricing: BHD 9.50 / Month / User</p>
+           <p className="mt-4 text-gray-400 text-xs font-bold uppercase tracking-widest">{"\n"}</p>
         </div>
      </div>
   </div>
