@@ -6,7 +6,7 @@ const personas = [
     icon: Crown,
     role: 'CEO',
     pain: 'No single view of customer health across brands & channels.',
-    delivers: 'Real-time executive dashboard on mobile — revenue, NPS, pipeline, campaign ROI in one glance.',
+    delivers: 'Real-time executive dashboard — revenue, NPS, pipeline, campaign ROI in one glance.',
     metric: '< 30s',
     metricLabel: 'Time to executive insight',
     accent: '#875A7B'
@@ -24,7 +24,7 @@ const personas = [
     icon: Briefcase,
     role: 'Head of Sales',
     pain: 'B2B hotel/HORECA leads tracked in spreadsheets and WhatsApp.',
-    delivers: 'Unified pipeline, AI lead scoring, automated follow-ups across email & WhatsApp.',
+    delivers: 'Unified pipeline, Lead scoring, automated follow-ups.',
     metric: '3.5x',
     metricLabel: 'Lead conversion lift',
     accent: '#875A7B'
@@ -42,7 +42,7 @@ const personas = [
     icon: Store,
     role: 'Head of Retail Ops',
     pain: 'Reactive stock decisions; no forward signal from CRM.',
-    delivers: 'Predictive demand from CRM pipeline + event calendar feeds LS Retail replenishment.',
+    delivers: 'CRM pipeline + event calendar feeds LS Retail replenishment.',
     metric: '−18%',
     metricLabel: 'Stock-outs on premium SKUs',
     accent: '#875A7B'
@@ -51,7 +51,7 @@ const personas = [
     icon: Server,
     role: 'IT Director',
     pain: 'Concern: another system to maintain, integrate and secure.',
-    delivers: 'Cloud-hosted, REST APIs to Navision/LS Retail, SSO, no rip-and-replace.',
+    delivers: 'Cloud-hosted, API Interfaces to Navision/LS Retail.',
     metric: '6 wks',
     metricLabel: 'Time to first production value',
     accent: '#017E84'
