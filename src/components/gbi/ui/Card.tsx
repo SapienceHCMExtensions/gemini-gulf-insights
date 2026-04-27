@@ -12,4 +12,5 @@ export const Card = ({ title, children, className = "" }: any) => {
     )}
     <div className="p-4 flex-1">{children}</div>
   </div>
-);
+  );
+};
