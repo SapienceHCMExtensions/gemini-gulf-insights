@@ -1,65 +1,82 @@
-## Why the 404 happens
+## Goal
 
-Netlify is publishing `dist/client/`, but that folder contains only `assets/` and `.assetsignore` — no `index.html`. Your build is currently producing a Cloudflare Workers SSR bundle (see `dist/server/wrangler.json` and `worker-entry-*.js` in the log). Netlify just serves static files and never runs that Worker, so requests to `/` have nothing to return.
+Add click-to-drill-down on every chart inside `GraphView` (bar, line, pie). Clicking a bar / point / slice opens a drill-down table directly below the chart, styled to match Odoo's native look so it feels like a real Odoo Graph view drill-down — not a custom UI bolted on.
 
-## Approach
+## Where to change
 
-This app is a pure client-side React presentation (one `App` component, no loaders, no server functions, no data fetching). The cleanest fix is to build it as a **static SPA** instead of an SSR Worker. No code changes to the presentation itself.
+All analytical charts on slides flow through one shared component: `src/components/gbi/views/GraphView.tsx` (used by `DashboardSlide`, `Customer360Slide`, `MarketingSlide`, `PipelineSlide`, `FBPerformanceSlide`, etc. via `ViewContainer`'s `graph` prop).
 
-Note: you selected "Migrate to Netlify". A full SSR-on-Netlify migration would require replacing the Cloudflare adapter, adding a Netlify Function for the SSR handler, etc. — but since the app has zero server-side logic, that's overkill. A static SPA build gives you the same end result with far less risk. If you'd rather do the full SSR migration anyway, tell me and I'll re-plan.
+Implementing drill-down inside `GraphView` gives every slide the feature with zero per-slide changes. Slide files get small data extensions to provide breakdown rows.
 
-## Changes
+## Odoo look & feel (the visual brief)
 
-### 1. Replace `vite.config.ts` to disable the TanStack Start SSR/Workers adapter
-Switch to a plain Vite + React + Tailwind + tsconfig-paths setup that produces a standard SPA in `dist/`:
+The drill-down panel must look like an Odoo grouped list / pivot drilldown:
+
+- **Container**: white background, 1px border `#dee2e6`, no rounded corners on the table itself, sits flush below the chart with a top border separating them (Odoo never floats panels — they're docked).
+- **Header bar above the table**: light grey `bg-[#f8f9fa]`, height ~32px, left side shows breadcrumb-style text `Group: <chart title> › <selected label>` in `#4c4c4c` with the › separators in `#875A7B`. Right side has a flat icon-only "×" close button (Odoo uses `fa-times`-style, no border, hover bg `#e9ecef`).
+- **Table**:
+  - Header row: `bg-[#f8f9fa]`, `text-[11px]`, `font-semibold`, `uppercase`, `tracking-wide`, color `#4c4c4c`, border-bottom `#dee2e6`, left-aligned for label cols, right-aligned for numeric cols (Odoo convention).
+  - Body rows: `text-[13px]`, color `#212529`, row height ~28px (`py-1.5`), border-bottom `#dee2e6`, hover `bg-[#f1f3f5]` (Odoo row hover).
+  - Numeric cells: right-aligned, monospace-ish via `tabular-nums`, with thousand separators.
+  - Last "Total" row: `font-semibold`, `bg-[#fafafa]`, top border slightly darker — mirrors Odoo pivot totals.
+- **Empty / single-item fallback**: when the clicked datum has no `breakdown`, show a 1-row Odoo-style table with columns `Label | Value | Share` derived from `label`, `value`, `percent`.
+- **Typography**: inherit the existing system stack already in use; no font swaps. Consistent with `PivotView`'s look so the two feel like the same product surface.
+- **Icons**: keep using lucide (already in the project) but pick the closest equivalents to Odoo's FontAwesome set — `X` for close, `ChevronRight` for breadcrumb separator (replaces ›).
+
+The chart-element selected state also gets an Odoo touch:
+- Bar: selected bar uses solid Odoo teal `#017E84` with a 1px darker outline; non-selected bars dim to `opacity-60`.
+- Line point: selected circle grows to `r=7`, fill `#017E84`, white halo ring.
+- Pie slice: selected slice nudged outward ~6px along its mid-angle, `stroke-width=3` white stroke (classic Odoo pie selection).
+
+## Data contract (backward compatible)
+
+Extend the `data` prop accepted by `GraphView`:
 
 ```ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-
-export default defineConfig({
-  plugins: [react(), tailwindcss(), tsconfigPaths()],
-});
+type GraphDatum = {
+  label: string;
+  value: string;       // display value (e.g. "BHD 184.5K")
+  percent: number;     // 0-100 for chart sizing
+  breakdown?: Array<{
+    name: string;                      // first column
+    value: number | string;            // numeric column (right-aligned, formatted)
+    secondary?: number | string;       // optional second numeric column
+    note?: string;                     // optional small grey caption under name
+  }>;
+};
 ```
 
-### 2. Add a SPA entry point
-- `index.html` at the project root mounting `<div id="root">` and loading `/src/main.tsx`.
-- `src/main.tsx` that creates a React root, sets up the TanStack Router (`RouterProvider` with `getRouter()`), and renders into `#root`.
-- Move the favicon `<link>` and document title into `index.html` (since `__root.tsx`'s `HeadContent`/`Scripts` only run during SSR).
+If `breakdown` is missing, drill-down still works via the single-row fallback. Slides without `breakdown` continue rendering exactly as today.
 
-### 3. Add `netlify.toml` at the repo root
-```toml
-[build]
-  command = "bun run build"
-  publish = "dist"
+## UX behavior
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-```
-The redirect rule is the SPA fallback so deep links / refresh don't 404.
+- Hover over a bar/point/slice shows pointer cursor (already mostly true).
+- Click selects that datum; click again on the same element, or click the × in the drill-down header, clears it.
+- Switching chart type (bar/line/pie) clears selection.
+- Drill-down panel is rendered below the chart inside the same `GraphView` flex column. Chart shrinks; drill-down gets `max-h-64 overflow-auto`. Layout stays clean at 943×674.
 
-### 4. Add `public/_redirects` as a backup
-```
-/*  /index.html  200
-```
+## Technical details
 
-### 5. Delete Workers-only files
-- `wrangler.jsonc` (no longer needed)
-- Optional: remove `@cloudflare/vite-plugin` and `@lovable.dev/vite-tanstack-config` from `package.json` to slim the install. (Safe to leave them; they're just unused.)
+File edits:
 
-## Netlify dashboard settings
+1. **`src/components/gbi/views/GraphView.tsx`**
+   - Add `selected: number | null` state and a `select(i)` toggler.
+   - Reset `selected` when `chart` changes.
+   - Wrap chart in `flex-1 min-h-0`; render `<OdooDrillDown />` below when `selected != null`.
+   - `BarChart`: each bar gets `onClick`; selected styling as described; non-selected dimmed.
+   - `LineChart`: each `<circle>` gets `onClick` + selected styling.
+   - `PieChart`: each `<path>` gets `onClick` + outward translate via `transform` along mid-angle.
+   - New local component `OdooDrillDown({ datum, title, onClose })` rendering the Odoo-styled header + table described above. Number formatting via `Intl.NumberFormat('en-US')`.
 
-After these changes, set in Netlify → Site settings → Build & deploy:
-- **Build command:** `bun run build` (or `npm run build`)
-- **Publish directory:** `dist`
+2. **Slide files — add `breakdown` to `GraphView` data** (so drill-downs are meaningful, not just fallback rows):
+   - `DashboardSlide.tsx` — monthly revenue → top channels for that month.
+   - `Customer360Slide.tsx` — engagement score per segment → top contributing accounts.
+   - `MarketingSlide.tsx`, `PipelineSlide.tsx`, `FBPerformanceSlide.tsx`, `RoadmapSlide.tsx`, `StakeholderValueMapSlide.tsx` — concise breakdowns matching each chart's theme. Slides without a `graph` prop are skipped.
 
-## Trade-offs
+No new dependencies. No routing/SSR changes. Pure client interaction.
 
-- ✅ Works on Netlify immediately, no Functions needed.
-- ✅ No code changes to your presentation.
-- ⚠️ You lose the ability to add TanStack Start server functions later. If you need them, switch back to Lovable Publish (Cloudflare) or do a full Netlify Functions migration.
-- ⚠️ The Lovable in-editor preview will keep working (Vite dev server is unaffected), but the live preview build pipeline targets the same SPA output now.
+## Out of scope (ask if you want them)
+
+- Drill-down on the bespoke mini-charts inside `DashboardSlide`'s dashboard view (custom hand-rolled bars/donut, not `GraphView`).
+- Drill-down on `PivotView` cells or KPI `Stat` cards.
+- Multi-level (nested) drill-down — only one level deep, matching the most common Odoo Graph drilldown behavior.
