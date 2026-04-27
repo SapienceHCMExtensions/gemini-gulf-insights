@@ -1,4 +1,5 @@
 import { Building2 } from 'lucide-react';
+import odooArchitecture from '@/assets/odoo-architecture.png';
 
 export const TitleSlide = () => (
   <div className="h-full bg-[#875A7B] flex flex-col items-center justify-center text-white relative overflow-hidden">
@@ -14,7 +15,7 @@ export const TitleSlide = () => (
         <span className="bg-white/10 px-6 py-2 rounded-full text-xs font-bold border border-white/20 uppercase tracking-widest">Real-Time Reporting</span>
       </div>
       <div className="mt-4 flex justify-center w-full">
-        <img src="https://images.archbee.com/oAyFj2GHlBeBVWF5OAir2/0e1VRdG0x282As3Icsr9X-20251216-152000.png" alt="Odoo Implementation Architecture" className="h-24 md:h-32 object-contain bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20" />
+        <img src={odooArchitecture} alt="Odoo Implementation Architecture" className="h-24 md:h-32 object-contain bg-white p-4 rounded-xl shadow-lg border border-white/20" />
       </div>
     </div>
     <div className="absolute bottom-10 right-10 flex items-center gap-3 opacity-60">
