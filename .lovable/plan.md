@@ -1,82 +1,74 @@
 ## Goal
 
-Add click-to-drill-down on every chart inside `GraphView` (bar, line, pie). Clicking a bar / point / slice opens a drill-down table directly below the chart, styled to match Odoo's native look so it feels like a real Odoo Graph view drill-down — not a custom UI bolted on.
+Make the two dashboard widgets on the GBI Distribution Analytics slide — "Sales by Key On-Trade Account" and "Revenue Channel Split" — drillable. Clicking a bar, donut segment, or legend item navigates to a dedicated drill-down **route** (new page, real URL) styled like an Odoo analytics detail view, with a clear "Back to GBI Distribution Analytics" action that returns to the dashboard slide.
 
-## Where to change
+## Architecture note
 
-All analytical charts on slides flow through one shared component: `src/components/gbi/views/GraphView.tsx` (used by `DashboardSlide`, `Customer360Slide`, `MarketingSlide`, `PipelineSlide`, `FBPerformanceSlide`, etc. via `ViewContainer`'s `graph` prop).
+Today the whole app is rendered at `/` by `App.tsx`, which is a slide-deck shell that swaps slide components via local state — slides are not routes. To deliver "a new page (route)", we add a real TanStack route alongside the deck:
 
-Implementing drill-down inside `GraphView` gives every slide the feature with zero per-slide changes. Slide files get small data extensions to provide breakdown rows.
-
-## Odoo look & feel (the visual brief)
-
-The drill-down panel must look like an Odoo grouped list / pivot drilldown:
-
-- **Container**: white background, 1px border `#dee2e6`, no rounded corners on the table itself, sits flush below the chart with a top border separating them (Odoo never floats panels — they're docked).
-- **Header bar above the table**: light grey `bg-[#f8f9fa]`, height ~32px, left side shows breadcrumb-style text `Group: <chart title> › <selected label>` in `#4c4c4c` with the › separators in `#875A7B`. Right side has a flat icon-only "×" close button (Odoo uses `fa-times`-style, no border, hover bg `#e9ecef`).
-- **Table**:
-  - Header row: `bg-[#f8f9fa]`, `text-[11px]`, `font-semibold`, `uppercase`, `tracking-wide`, color `#4c4c4c`, border-bottom `#dee2e6`, left-aligned for label cols, right-aligned for numeric cols (Odoo convention).
-  - Body rows: `text-[13px]`, color `#212529`, row height ~28px (`py-1.5`), border-bottom `#dee2e6`, hover `bg-[#f1f3f5]` (Odoo row hover).
-  - Numeric cells: right-aligned, monospace-ish via `tabular-nums`, with thousand separators.
-  - Last "Total" row: `font-semibold`, `bg-[#fafafa]`, top border slightly darker — mirrors Odoo pivot totals.
-- **Empty / single-item fallback**: when the clicked datum has no `breakdown`, show a 1-row Odoo-style table with columns `Label | Value | Share` derived from `label`, `value`, `percent`.
-- **Typography**: inherit the existing system stack already in use; no font swaps. Consistent with `PivotView`'s look so the two feel like the same product surface.
-- **Icons**: keep using lucide (already in the project) but pick the closest equivalents to Odoo's FontAwesome set — `X` for close, `ChevronRight` for breadcrumb separator (replaces ›).
-
-The chart-element selected state also gets an Odoo touch:
-- Bar: selected bar uses solid Odoo teal `#017E84` with a 1px darker outline; non-selected bars dim to `opacity-60`.
-- Line point: selected circle grows to `r=7`, fill `#017E84`, white halo ring.
-- Pie slice: selected slice nudged outward ~6px along its mid-angle, `stroke-width=3` white stroke (classic Odoo pie selection).
-
-## Data contract (backward compatible)
-
-Extend the `data` prop accepted by `GraphView`:
-
-```ts
-type GraphDatum = {
-  label: string;
-  value: string;       // display value (e.g. "BHD 184.5K")
-  percent: number;     // 0-100 for chart sizing
-  breakdown?: Array<{
-    name: string;                      // first column
-    value: number | string;            // numeric column (right-aligned, formatted)
-    secondary?: number | string;       // optional second numeric column
-    note?: string;                     // optional small grey caption under name
-  }>;
-};
+```
+src/routes/
+  index.tsx                  -> / (existing slide deck)
+  drilldown.$widget.tsx      -> /drilldown/:widget (new)
 ```
 
-If `breakdown` is missing, drill-down still works via the single-row fallback. Slides without `breakdown` continue rendering exactly as today.
+Navigating to `/drilldown/on-trade-accounts` or `/drilldown/revenue-channel` opens a standalone Odoo-styled detail page. Clicking "Back" navigates to `/`, which re-renders the slide deck. The deck's local slide index will reset to 0 (Title slide) on return — see "Trade-off" below.
 
-## UX behavior
+## What changes
 
-- Hover over a bar/point/slice shows pointer cursor (already mostly true).
-- Click selects that datum; click again on the same element, or click the × in the drill-down header, clears it.
-- Switching chart type (bar/line/pie) clears selection.
-- Drill-down panel is rendered below the chart inside the same `GraphView` flex column. Chart shrinks; drill-down gets `max-h-64 overflow-auto`. Layout stays clean at 943×674.
+### 1. New route: `src/routes/drilldown.$widget.tsx`
 
-## Technical details
+A new TanStack Start file route registered automatically by the Vite plugin. It contains:
 
-File edits:
+- A `WIDGETS` lookup keyed by widget ID with the data + metadata for each drill-down (parent, title, subtitle, measure label, unit, rows). Two entries: `on-trade-accounts` and `revenue-channel`.
+- `loader` resolves the widget config; throws `notFound()` for unknown IDs.
+- `head()` sets a per-route title/description.
+- `notFoundComponent` shows an Odoo-styled "not found" with a back link to `/`.
+- The page renders the Odoo analytics detail layout described below.
 
-1. **`src/components/gbi/views/GraphView.tsx`**
-   - Add `selected: number | null` state and a `select(i)` toggler.
-   - Reset `selected` when `chart` changes.
-   - Wrap chart in `flex-1 min-h-0`; render `<OdooDrillDown />` below when `selected != null`.
-   - `BarChart`: each bar gets `onClick`; selected styling as described; non-selected dimmed.
-   - `LineChart`: each `<circle>` gets `onClick` + selected styling.
-   - `PieChart`: each `<path>` gets `onClick` + outward translate via `transform` along mid-angle.
-   - New local component `OdooDrillDown({ datum, title, onClose })` rendering the Odoo-styled header + table described above. Number formatting via `Intl.NumberFormat('en-US')`.
+### 2. `src/components/gbi/slides/DashboardSlide.tsx`
 
-2. **Slide files — add `breakdown` to `GraphView` data** (so drill-downs are meaningful, not just fallback rows):
-   - `DashboardSlide.tsx` — monthly revenue → top channels for that month.
-   - `Customer360Slide.tsx` — engagement score per segment → top contributing accounts.
-   - `MarketingSlide.tsx`, `PipelineSlide.tsx`, `FBPerformanceSlide.tsx`, `RoadmapSlide.tsx`, `StakeholderValueMapSlide.tsx` — concise breakdowns matching each chart's theme. Slides without a `graph` prop are skipped.
+Replace the static bars and donut with interactive elements that link to the route:
 
-No new dependencies. No routing/SSR changes. Pure client interaction.
+- **Sales by Key On-Trade Account** — wrap each bar in a `<Link to="/drilldown/$widget" params={{ widget: "on-trade-accounts" }}>` so the whole column is clickable. Hover styling: bar swaps to `#017E84`, slight scale, pointer cursor. The card title gets a small "Drill down →" hint.
+- **Revenue Channel Split** — make each legend row a `<Link to="/drilldown/$widget" params={{ widget: "revenue-channel" }}>`. Wrap the donut itself in the same link so clicking the visual also drills in. Hover: legend row gets `bg-[#f1f3f5]`, donut gets a subtle ring.
+- Both cards remain visually identical; only interactivity is added. No data changes.
 
-## Out of scope (ask if you want them)
+### 3. No router/config changes
 
-- Drill-down on the bespoke mini-charts inside `DashboardSlide`'s dashboard view (custom hand-rolled bars/donut, not `GraphView`).
-- Drill-down on `PivotView` cells or KPI `Stat` cards.
-- Multi-level (nested) drill-down — only one level deep, matching the most common Odoo Graph drilldown behavior.
+`@tanstack/react-router` is already wired (root route exists). The Vite plugin auto-discovers the new file and regenerates `routeTree.gen.ts` — no manual edits.
+
+## Odoo look & feel for the drill-down page
+
+Layout (full viewport):
+
+1. **Top app bar** — `#714B67` background, white text, small Odoo-style logo box on the left, "Sales Analytics" label, search icon + user avatar on the right. Mirrors Odoo's chrome.
+2. **Breadcrumb / control bar** — white, bottom border `#dee2e6`. Left: `← GBI Distribution Analytics  ›  Drill-Down  ›  <Widget Name>` with the back-arrow link in `#875A7B`. Right: Filters, Export, and a flat `×` close button (also navigates back to `/`).
+3. **Page header** — large `#212529` title + grey subtitle.
+4. **Content grid** (3 columns on lg, stacks below):
+   - **Bar visualization (2 cols)** — Odoo Graph-style: left-aligned name + right-aligned value/share rows, each with a horizontal `#875A7B` progress bar that hovers to `#017E84`. Card has the standard Odoo header strip (`bg-[#f8f9fa]`, uppercase 11px label, `#dee2e6` border).
+   - **Summary card (1 col)** — Records, Total, Top Contributor, Avg per Record. Total highlighted in Odoo teal.
+   - **Breakdown table (full width)** — Odoo list view: `#f8f9fa` header, 11px uppercase column labels, `#dee2e6` row borders, `#f1f3f5` row hover, right-aligned numerics with `tabular-nums`, and a final Total row with `bg-[#fafafa]` and a thicker top border. Trend column shows ±% in red/green.
+5. **Footer bar** — white, bordered top. Primary "Back to GBI Distribution Analytics" button in Odoo purple on the left; small caption on the right.
+
+Typography stays in the project's existing system stack — no font swaps. All numeric formatting uses `Intl.NumberFormat('en-US')`. All icons via lucide.
+
+## Data shown
+
+- **on-trade-accounts**: 6 hospitality accounts (Ritz-Carlton, Four Seasons, Gulf Hotel, InterContinental Regency, Sofitel Zallaq, Wyndham Grand) with revenue, share %, MoM trend, and a note on the top contributor.
+- **revenue-channel**: 3 channels (On-Trade, Retail Store, GBI Express) with revenue, share %, trend, and a contextual note. Numbers align with the existing dashboard story (65/25/10 split, total ~BHD 845K).
+
+## Trade-off (so you can decide before I build)
+
+Returning to `/` re-mounts the slide deck. Because `App.tsx` keeps `currentSlide` in local React state, the user lands on the Title slide rather than the GBI Distribution Analytics slide they came from. Two options:
+
+- **A. Accept it (default)** — Simplest, zero refactor of the deck. Back link returns to slide 1 of the deck.
+- **B. Persist current slide in the URL** — Convert the deck to read its current slide index from a search param (e.g. `/?slide=2`) so the drill-down link can carry it and return restores the same slide. Small refactor of `App.tsx` (~15 lines) to read/write `useSearch`/`useNavigate` instead of `useState`. Recommended if you want a polished "back to exactly where I was" experience.
+
+I'll go with **A** unless you say otherwise — it matches your one-line ask and keeps the change scoped.
+
+## Out of scope
+
+- Drill-down on other dashboard slides (FBPerformance, Marketing, Pipeline, Customer360 dashboards) — their dashboards use different patterns and you only asked about this slide.
+- Persisting filters across drill-downs.
+- Real backend data — the drill-down data is co-located with the route (same pattern as the existing slide data).
