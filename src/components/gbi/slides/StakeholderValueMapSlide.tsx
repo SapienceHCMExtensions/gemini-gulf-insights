@@ -1,4 +1,4 @@
-import { Crown, Calculator, Briefcase, Megaphone, Store, Server, Link2 } from 'lucide-react';
+import { Crown, Briefcase, Megaphone, Server, Link2 } from 'lucide-react';
 import { Header } from '../layout/Header';
 
 const personas = [
@@ -10,15 +10,6 @@ const personas = [
     metric: '< 30s',
     metricLabel: 'Time to executive insight',
     accent: '#875A7B'
-  },
-  {
-    icon: Calculator,
-    role: 'CFO',
-    pain: 'Marketing spend ROI unclear; finance reconciles across systems.',
-    delivers: 'Campaign-to-cash attribution, BHD per lead per channel, automated Navision sync.',
-    metric: '+22%',
-    metricLabel: 'Marketing ROI visibility',
-    accent: '#017E84'
   },
   {
     icon: Briefcase,
@@ -39,15 +30,6 @@ const personas = [
     accent: '#017E84'
   },
   {
-    icon: Store,
-    role: 'Head of Retail Ops',
-    pain: 'Reactive stock decisions; no forward signal from CRM.',
-    delivers: 'CRM pipeline + event calendar feeds LS Retail replenishment.',
-    metric: '−18%',
-    metricLabel: 'Stock-outs on premium SKUs',
-    accent: '#875A7B'
-  },
-  {
     icon: Server,
     role: 'IT Director',
     pain: 'Concern: another system to maintain, integrate and secure.',
@@ -64,7 +46,7 @@ export const StakeholderValueMapSlide = () => (
     <div className="flex-1 flex flex-col px-8 md:px-12 py-6 pb-24 overflow-y-auto">
       <div className="text-center mb-6 shrink-0">
         <div className="inline-block text-[10px] font-bold uppercase tracking-widest text-[#875A7B] bg-purple-50 px-3 py-1 rounded-full mb-3">For Every Seat at the Table</div>
-        <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">One Platform. Six Stakeholders. Measurable Wins.</h2>
+        <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">One Platform. Four Stakeholders. Measurable Wins.</h2>
         <p className="text-sm text-gray-500 max-w-2xl mx-auto">Odoo speaks the language of every leader at GBI — quantified outcomes, not feature lists.</p>
       </div>
 
